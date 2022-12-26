@@ -3,4 +3,4 @@ set(BOARD esp32)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(firmware)
 
-target_sources(app PRIVATE src/main.c)
+target_sources(app PRIVATE src/main.c src/heartbeat/heartbeat.c src/motors/motors.c)

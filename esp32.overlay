@@ -1,12 +1,28 @@
 / {
     aliases {
-        led0 = &myled0;
+        heartbeatled = &ledhb;
+        hbridgein1 = &ledin1;
+        hbridgein2 = &ledin2;
+        hbridgein3 = &ledin3;
+        hbridgein4 = &ledin4;
     };
 
     leds {
         compatible = "gpio-leds";
-        myled0: led_0 {
+        ledhb: led_0 {
             gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+        };
+        ledin1: led_1 {
+            gpios = <&gpio0 16 GPIO_ACTIVE_HIGH>;
+        };
+        ledin2: led_2 {
+            gpios = <&gpio0 4 GPIO_ACTIVE_HIGH>;
+        };
+        ledin3: led_3 {
+            gpios = <&gpio0 8 GPIO_ACTIVE_HIGH>;
+        };
+        ledin4: led_4 {
+            gpios = <&gpio0 7 GPIO_ACTIVE_HIGH>;
         };
     };
 };

@@ -1,36 +1,20 @@
 #include <zephyr/kernel.h>
-#include <zephyr/drivers/gpio.h>
+#include "heartbeat/heartbeat.h"
 
-/* 1000 msec = 1 sec */
-#define SLEEP_TIME_MS 1000
+#define STACK_BLOCK_SIZE 1024
+#define STACK_BLOCKS(b) (STACK_BLOCK_SIZE * b)
 
-/* The devicetree node identifier for the "led0" alias. */
-#define LED0_NODE DT_ALIAS(led0)
+#define NO_POINTER NULL
+#define LOW_PRIORITY (K_LOWEST_THREAD_PRIO - 1)
+#define NO_OPTIONS 0
+#define NO_DELAY 0
 
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
-
-void main(void)
-{
-    int ret;
-
-    if (!device_is_ready(led.port))
-    {
-        return;
-    }
-
-    ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
-    if (ret < 0)
-    {
-        return;
-    }
-
-    while (1)
-    {
-        ret = gpio_pin_toggle_dt(&led);
-        if (ret < 0)
-        {
-            return;
-        }
-        k_msleep(SLEEP_TIME_MS);
-    }
-}
+K_THREAD_DEFINE(heartbeat_thread,
+                STACK_BLOCKS(1),
+                heartbeat,
+                NO_POINTER,
+                NO_POINTER,
+                NO_POINTER,
+                LOW_PRIORITY,
+                NO_OPTIONS,
+                NO_DELAY);
