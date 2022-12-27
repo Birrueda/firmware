@@ -11,6 +11,8 @@
 #ifndef SRC_MOTORS_MOTORS_H
 #define SRC_MOTORS_MOTORS_H
 
+#include <stdint.h>
+
 /**
  * @brief The posible combinations for 2 motors
  *
@@ -23,6 +25,13 @@ typedef enum MotorsDirection
     MotorsDirection_CLOCKWISE,
     MotorsDirection_COUNTERCLOCKWISE
 } MotorsDirection_t;
+
+typedef enum MotorSide
+{
+    MotorSide_PORT,
+    MotorSide_STARBOARD,
+    MotorSide_ALL
+} MotorSide_t;
 
 /**
  * @brief It start and verify the peripherals for H-bridge control
@@ -38,4 +47,5 @@ int MotorsInit(void);
  */
 void MotorsSetDirection(MotorsDirection_t direction);
 
+void MotorsSetDuty(MotorSide_t side, uint8_t duty);
 #endif /* SRC_MOTORS_MOTORS_H */

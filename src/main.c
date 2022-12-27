@@ -16,14 +16,19 @@ void MotorsTest(void)
     while (1)
     {
         MotorsSetDirection(MotorsDirection_STOP);
+        MotorsSetDuty(MotorSide_ALL, 0);
         k_msleep(1000);
         MotorsSetDirection(MotorsDirection_FORWARD);
+        MotorsSetDuty(MotorSide_ALL, 31);
         k_msleep(1000);
         MotorsSetDirection(MotorsDirection_BACKWARD);
+        MotorsSetDuty(MotorSide_ALL, 63);
         k_msleep(1000);
         MotorsSetDirection(MotorsDirection_CLOCKWISE);
+        MotorsSetDuty(MotorSide_ALL, 127);
         k_msleep(1000);
         MotorsSetDirection(MotorsDirection_COUNTERCLOCKWISE);
+        MotorsSetDuty(MotorSide_ALL, 255);
         k_msleep(1000);
     }
 }

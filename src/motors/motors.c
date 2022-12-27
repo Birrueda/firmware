@@ -10,6 +10,7 @@
  */
 #include "motors.h"
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/drivers/pwm.h>
 
 #define IN1_NODE DT_ALIAS(hbridgein1)
 #define IN2_NODE DT_ALIAS(hbridgein2)
@@ -20,6 +21,8 @@ static const struct gpio_dt_spec in1_led = GPIO_DT_SPEC_GET(IN1_NODE, gpios);
 static const struct gpio_dt_spec in2_led = GPIO_DT_SPEC_GET(IN2_NODE, gpios);
 static const struct gpio_dt_spec in3_led = GPIO_DT_SPEC_GET(IN3_NODE, gpios);
 static const struct gpio_dt_spec in4_led = GPIO_DT_SPEC_GET(IN4_NODE, gpios);
+
+static const struct pwm_dt_spec pwm_a = PWM_DT_SPEC_GET(DT_NODELABEL(pwm_ena_a));
 
 static inline void motorsDirectionStop(void)
 {
@@ -68,32 +71,24 @@ int MotorsInit(void)
     bool ready = device_is_ready(in1_led.port)
               && device_is_ready(in2_led.port)
               && device_is_ready(in3_led.port)
-              && device_is_ready(in4_led.port);
+              && device_is_ready(in4_led.port)
+              && device_is_ready(pwm_a.dev);
     /* clang-format on */
     if (!ready)
     {
         return -1;
     }
 
-    ret = gpio_pin_configure_dt(&in1_led, GPIO_OUTPUT_INACTIVE);
+    /* clang-format off */
+    ret = gpio_pin_configure_dt(&in1_led, GPIO_OUTPUT_INACTIVE)
+        - gpio_pin_configure_dt(&in2_led, GPIO_OUTPUT_INACTIVE)
+        - gpio_pin_configure_dt(&in3_led, GPIO_OUTPUT_INACTIVE)
+        - gpio_pin_configure_dt(&in4_led, GPIO_OUTPUT_INACTIVE)
+        - pwm_set_pulse_dt(&pwm_a, 0U);
+    /* clang-format on */
     if (ret < 0)
     {
-        return -1;
-    }
-    ret = gpio_pin_configure_dt(&in2_led, GPIO_OUTPUT_INACTIVE);
-    if (ret < 0)
-    {
-        return -1;
-    }
-    ret = gpio_pin_configure_dt(&in3_led, GPIO_OUTPUT_INACTIVE);
-    if (ret < 0)
-    {
-        return -1;
-    }
-    ret = gpio_pin_configure_dt(&in4_led, GPIO_OUTPUT_INACTIVE);
-    if (ret < 0)
-    {
-        return -1;
+        return ret;
     }
     return 0;
 }
@@ -119,6 +114,38 @@ void MotorsSetDirection(MotorsDirection_t direction)
         break;
     default:
         motorsDirectionStop();
+        break;
+    }
+}
+
+static inline void MotorPortSetDuty(uint8_t duty)
+{
+    uint32_t d = (pwm_a.period / UINT8_MAX) * (uint32_t)duty;
+    pwm_set_pulse_dt(&pwm_a, d);
+}
+
+static inline void MotorStarboardSetDuty(uint8_t duty)
+{
+}
+
+void MotorsSetDuty(MotorSide_t side, uint8_t duty)
+{
+    switch (side)
+    {
+    case MotorSide_PORT:
+        MotorPortSetDuty(duty);
+        break;
+    case MotorSide_STARBOARD:
+        MotorStarboardSetDuty(duty);
+        break;
+    case MotorSide_ALL:
+        MotorPortSetDuty(duty);
+        MotorStarboardSetDuty(duty);
+        break;
+    default:
+        MotorPortSetDuty(0U);
+        MotorStarboardSetDuty(0U);
+        MotorsSetDirection(MotorsDirection_STOP);
         break;
     }
 }
