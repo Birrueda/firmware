@@ -13,20 +13,20 @@
 #include <zephyr/drivers/gpio.h>
 
 #define SLEEP_TIME_MS 1000
-#define LED0_NODE DT_ALIAS(heartbeatled)
+#define HEARTBEAT_LED DT_ALIAS(heartbeatled)
 
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+static const struct gpio_dt_spec heartbeat_led = GPIO_DT_SPEC_GET(HEARTBEAT_LED, gpios);
 
 void heartbeat(void)
 {
     int ret;
 
-    if (!device_is_ready(led.port))
+    if (!device_is_ready(heartbeat_led.port))
     {
         return;
     }
 
-    ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
+    ret = gpio_pin_configure_dt(&heartbeat_led, GPIO_OUTPUT_ACTIVE);
     if (ret < 0)
     {
         return;
@@ -34,7 +34,7 @@ void heartbeat(void)
 
     while (1)
     {
-        ret = gpio_pin_toggle_dt(&led);
+        ret = gpio_pin_toggle_dt(&heartbeat_led);
         if (ret < 0)
         {
             return;
