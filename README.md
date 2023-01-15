@@ -18,7 +18,7 @@ El manual de referencia se encuentra en [esp32-reference-manual](docs/esp32_tech
 2. Ingresar dentro del proyecto
 3. Ejecutar el comando `west build -b esp32 -p` para compilar el firmware
 4. Asegurarse de tener la placa *Nodemcu ESP32 Wroom* conectada al ordenador.
-5. Ejecutar el comando `west flash --esp-baud-rate 115200` para grabar el firmware en la placa
+5. Ejecutar el comando `west flash --esp-baud-rate 57600` para grabar el firmware en la placa
 
 Se puede monitorear la secuencia de boot y mensajes del kernel con el siguiente comando:
 

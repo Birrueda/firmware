@@ -25,10 +25,14 @@
             gpios = <&gpio0 12 GPIO_ACTIVE_HIGH>;
         };
     };
+
     pwmleds {
         compatible = "pwm-leds";
         pwm_ena_a: pwm_ena_a {
             pwms = <&ledc0 0 10000 PWM_POLARITY_NORMAL>;
+        };
+        pwm_ena_b: pwm_ena_b {
+            pwms = <&ledc0 1 10000 PWM_POLARITY_NORMAL>;
         };
     };
 };
@@ -36,7 +40,8 @@
 &pinctrl {
     ledc0_default: ledc0_default {
         group1 {
-            pinmux = <LEDC_CH0_GPIO10>;
+            pinmux = <LEDC_CH0_GPIO10>,
+                     <LEDC_CH1_GPIO11>;
             output-enable;
         };
     };
@@ -51,5 +56,9 @@
     channel0@0 {
         reg = <0x0>;
         timer = <0>;
+    };
+    channel1@1 {
+        reg = <0x1>;
+        timer = <1>;
     };
 };

@@ -23,6 +23,7 @@ static const struct gpio_dt_spec in3_led = GPIO_DT_SPEC_GET(IN3_NODE, gpios);
 static const struct gpio_dt_spec in4_led = GPIO_DT_SPEC_GET(IN4_NODE, gpios);
 
 static const struct pwm_dt_spec pwm_a = PWM_DT_SPEC_GET(DT_NODELABEL(pwm_ena_a));
+static const struct pwm_dt_spec pwm_b = PWM_DT_SPEC_GET(DT_NODELABEL(pwm_ena_b));
 
 static inline void motorsDirectionStop(void)
 {
@@ -72,11 +73,13 @@ int MotorsInit(void)
               && device_is_ready(in2_led.port)
               && device_is_ready(in3_led.port)
               && device_is_ready(in4_led.port)
-              && device_is_ready(pwm_a.dev);
+              && device_is_ready(pwm_a.dev)
+              && device_is_ready(pwm_b.dev);
     /* clang-format on */
     if (!ready)
     {
-        return -1;
+        //return -1;
+        ret = -1;
     }
 
     /* clang-format off */
@@ -84,7 +87,8 @@ int MotorsInit(void)
         - gpio_pin_configure_dt(&in2_led, GPIO_OUTPUT_INACTIVE)
         - gpio_pin_configure_dt(&in3_led, GPIO_OUTPUT_INACTIVE)
         - gpio_pin_configure_dt(&in4_led, GPIO_OUTPUT_INACTIVE)
-        - pwm_set_pulse_dt(&pwm_a, 0U);
+        - pwm_set_pulse_dt(&pwm_a, 0U)
+        - pwm_set_pulse_dt(&pwm_b, 0U);
     /* clang-format on */
     if (ret < 0)
     {
@@ -126,6 +130,8 @@ static inline void MotorPortSetDuty(uint8_t duty)
 
 static inline void MotorStarboardSetDuty(uint8_t duty)
 {
+    uint32_t d = (pwm_b.period / UINT8_MAX) * (uint32_t)duty;
+    pwm_set_pulse_dt(&pwm_b, d);
 }
 
 void MotorsSetDuty(MotorSide_t side, uint8_t duty)
